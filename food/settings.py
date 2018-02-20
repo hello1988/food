@@ -120,11 +120,24 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # local setting for development.
 
 IS_HEROKU = os.environ.get('IS_HEROKU', False)
 
 if IS_HEROKU:
+    DEBUG = False
+
+    PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+    STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
+
+    # Extra places for collectstatic to find static files.
+    STATICFILES_DIRS = (
+        os.path.join(PROJECT_ROOT, 'static'),
+    )
+    STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
     LINE_BOT_ACCESS_TOKEN = os.environ.get('LINE_BOT_ACCESS_TOKEN', None)
     LINE_BOT_SECRET = os.environ.get('LINE_BOT_SECRET', None)
 
