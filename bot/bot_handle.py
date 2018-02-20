@@ -1,6 +1,7 @@
 from pytz import timezone
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from dateutil.parser import parse
 import random
 
 from django.conf import settings
@@ -69,6 +70,12 @@ def message_text(event):
     if check_action(member):
         handler = ActionHandler(member)
         handler.handle(text_from_user)
+        return
+
+    dt = try_parse_datetime(text_from_user)
+    if dt is not None:
+        handler = LogHandler(member)
+        handler.handle(datetime=dt)
 
     elif text_from_user == '今天':
         handler = LogHandler(member)
@@ -78,12 +85,12 @@ def message_text(event):
         handler.handle(type=YESTERDAY)
 
     elif text_from_user == '本週':
-            handler = LogHandler(member)
-            handler.handle(type=THIS_WEEK)
+        handler = LogHandler(member)
+        handler.handle(type=THIS_WEEK)
 
     elif text_from_user == '上週':
-            handler = LogHandler(member)
-            handler.handle(type=LAST_WEEK)
+        handler = LogHandler(member)
+        handler.handle(type=LAST_WEEK)
 
 def check_action(member):
     if not member.last_action:
@@ -95,6 +102,14 @@ def check_action(member):
         return False
 
     return True
+
+def try_parse_datetime(text):
+    try:
+        tz = timezone(settings.TIME_ZONE)
+        return parse(text).replace(tzinfo=tz)
+    except:
+        return None
+
 
 @handler.add(MessageEvent, message=(ImageMessage,))
 def handle_content_message(event):

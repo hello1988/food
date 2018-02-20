@@ -1,6 +1,5 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from dateutil.parser import parse
 from pytz import timezone
 
 from bot.constants import *
@@ -27,12 +26,12 @@ class LogHandler(BaseHandler):
 
     def handle(self, **kwargs):
         type = kwargs.get('type', None)
-        date_str = kwargs.get('date',None)
+        dt = kwargs.get('datetime',None)
         start_time = end_time = None
         if type is not None:
             start_time, end_time = self.__get_duration_by_type(type)
-        elif date_str is not None:
-            start_time, end_time = self.__get_duration_by_date_string(date_str)
+        elif dt is not None:
+            start_time, end_time = self.__get_duration_by_datetime(dt)
         else:
             return
 
@@ -66,9 +65,8 @@ class LogHandler(BaseHandler):
 
         return start_time, end_time
 
-    def __get_duration_by_date_string(self, date_str):
-        tz = timezone(settings.TIME_ZONE)
-        start_time = parse(date_str).replace(hour=0, minute=0, second=0, microsecond=0, tzinfo=tz)
+    def __get_duration_by_datetime(self, dt):
+        start_time = dt.replace(hour=0, minute=0, second=0, microsecond=0)
         end_time = start_time + relativedelta(days=1)
 
         return start_time, end_time
