@@ -16,9 +16,11 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from bot.urls import urlpatterns as bot_url
+from bot.views import test
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^bot/', include(bot_url)),
+    url(r'^test/', test),
 
 ]
